@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.vesns.netdisk.mapper.UserFileMapper">
+    <update id="replaceFilePath">
+        update netdisk.userfile
+        set filePath = REPLACE(filePath, #{oldFilePath}, #{filePath})
+        where filePath LIKE N'${oldFilePath}%'
+          and userId = #{userId};
+    </update>
+
+    <select id="getUserFileList" resultType="cn.vesns.netdisk.common.vo.file.FileListVo">
+        select *
+        from netdisk.userfile uf
+                     left join netdisk.file on file.fileId = uf.fileId
+        <where>
+            <if test="userFile.userId != null">
+                and uf.userId = #{userFile.userId}
+            </if>
+            <if test="userFile.filePath != null">
+                and uf.filePath = #{userFile.filePath}
+            </if>
+            <if test="userFile.extendName != null">
+                and uf.extendName = #{userFile.filePath}
+            </if>
+            <if test="userFile.userFileId != null">
+                and uf.userFileId = #{userFile.userFileId}
+            </if>
+            <if test="userFile.fileName != null">
+                and uf.fileName = #{userFile.fileName}
+            </if>
+            and uf.deleteFlag = 0
+        </where>
+        order by isDir desc
+        <if test="beginCount != null and pageCount != null">
+            limit #{beginCount}, #{pageCount}
+        </if>
+    </select>
+
+    <update id="updateFilepathByPathAndName">
+        update netdisk.userfile
+        set filePath = #{param2}
+                where filePath = #{param1}
+                  and fileName = #{param3}
+        <if test="param4 != null">
+            and extendName = #{param4}
+        </if>
+        <if test="param4 == null">
+            and extendName is null
+        </if>
+        and userId = #{param5}
+    </update>
+
+    <update id="updateFilepathByFilepath">
+        update netdisk.userfile
+        set filePath =replace(filePath, #{param1}, #{param2})
+        where filePath like N'${param1}'
+          and userId = #{param3}
+    </update>
+
+    <insert id="batchInsertByPathAndName">
+        insert into netdisk.userfile(deleteBatchNum, deleteFlag, deleteTime,
+                                     extendName, fileId, fileName, filePath, isDir, uploadTime, userId)
+                (select deleteBatchNum,
+                        deleteFlag,
+                        deleteTime,
+                        extendName,
+                        fileId,
+                        fileName,
+                        #{newFilePath},
+                        isDir,
+                        uploadTime,
+                        userId
+                 from netdisk.userfile
+        <where>
+            <if test="userId != null">
+                and userId = #{userId}
+            </if>
+            <if test="fileName != null">
+                and fileName = #{fileName}
+            </if>
+            <if test="oldFilePath != null">
+                and oldFileName = #{oldFilePath}
+            </if>
+            <choose>
+                <when test="extendName != null">
+                    and extendName = #{extendName}
+                </when>
+                <otherwise>
+                    and isDir = 1
+                </otherwise>
+            </choose>
+        </where>
+        )
+    </insert>
+
+    <insert id="batchInsertByFilepath">
+        insert into netdisk.userfile(deleteBatchNum, deleteFlag, deleteTime,
+                                     extendName, fileId, fileName, filePath, isDir, uploadTime, userId)
+                (select deleteBatchNum,
+                        deleteFlag,
+                        deleteTime,
+                        extendName,
+                        fileId,
+                        fileName,
+                        REPLACE(filePath, #{oldFilePath}, #{newFilePath}),
+                        isDir,
+                        uploadTime,
+                        userId
+                 from netdisk.userfile
+                 where filePath like N'${oldFilePath}%'
+                   and userId = #{userId}
+                        )
+    </insert>
+
+    <sql id="selectExtendName">
+        left join netdisk.file on file.fileId = userFile.fileId
+        where extendName in
+        <foreach collection="fileNameList" open="(" close=")" separator="," item="fileName" index="index">
+            #{fileName}
+        </foreach>
+        and userId = #{userId} and deleteFlag = 0
+    </sql>
+
+    <select id="selectFileByExtendName" parameterType="cn.vesns.netdisk.pojo.UserFile"
+            resultType="cn.vesns.netdisk.common.vo.file.FileListVo">
+        select * from netdisk.userfile
+        <include refid="selectExtendName"/>
+        limit #{beginCount},#{pageCount}
+    </select>
+
+    <sql id="selectByNotExtendName">
+        left join netdisk.file on file.fileId = userfile.fileId
+        where extendName not in
+        <foreach collection="fileNameList" open="(" close=")" separator="," item="fileName">
+            #{fileName}
+        </foreach>
+        and userId = #{userId} and deleteFlag = 0
+    </sql>
+
+
+    <select id="selectCountByExtendName" parameterType="cn.vesns.netdisk.pojo.UserFile" resultType="java.lang.Long">
+        select count(*) from netdisk.userfile
+        <include refid="selectExtendName">
+        </include>
+    </select>
+
+    <select id="selectFileNotInExtendNames" parameterType="cn.vesns.netdisk.pojo.UserFile"
+            resultType="cn.vesns.netdisk.common.vo.file.FileListVo">
+        select *
+        from netdisk.userfile
+        <include refid="selectByNotExtendName"/>
+        limit #{beginCount} , #{pageCount}
+    </select>
+
+    <select id="selectCountNotInExtendNames" parameterType="cn.vesns.netdisk.pojo.UserFile" resultType="java.lang.Long">
+        select count(*)
+                from netdisk.userfile
+        <include refid="selectByNotExtendName">
+        </include>
+    </select>
+
+    <select id="selectStorageSizeByUserId" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT SUM(netdisk.file.fileSize)
+        FROM netdisk.userfile
+                     LEFT JOIN netdisk.file ON file.fileId = userfile.fileId
+        WHERE userfile.userId = #{userId}
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.vesns.netdisk.mapper.UserMapper">
+    <insert id="insertUser" parameterType="cn.vesns.netdisk.pojo.User" >
+        insert into netdisk.user(username, password, email, imgUrl, realname, sex, telphone, address, registertime,salt)
+        values (#{username}, #{password}, #{email}, #{imgUrl}, #{realname}, #{sex}, #{telephone}, #{address},
+                #{registerTime},#{salt})
+    </insert>
+
+    <insert id="insertRole" parameterType="long">
+        insert into netdisk.user_role(userId, roleid)
+        values (#{param1}, #{param2});
+    </insert>
+</mapper>

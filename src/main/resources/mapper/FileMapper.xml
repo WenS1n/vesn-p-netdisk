@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.vesns.netdisk.mapper.FileMapper">
+<insert id="batchInsertFile" parameterType="List">
+    insert into netdisk.uploadtask(extendName, fileName, filePath, identifier, uploadStatus, uploadTime, userId)
+    <foreach collection="list" item="file" index="index" separator=",">
+        values (#{extendName},#{fileName},#{filePath},#{identfier},#{uploadStatus},#{uploadTime},#{userrId});
+    </foreach>
+</insert>
+</mapper>

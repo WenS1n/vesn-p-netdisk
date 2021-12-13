@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.vesns.netdisk.mapper.ShareFileMapper">
+    <insert id="batchInsertShareFile" parameterType="list">
+        insert into netdisk.sharefile(shareFileId,shareBatchNum, shareFilePath, userFileId)
+        values
+        <foreach collection="list" item="file" index="index" separator=",">
+            (#{file.shareFileId},#{file.shareBatchNum}, #{file.shareFilePath}, #{file.userFileId})
+        </foreach>
+    </insert>
+
+    <select id="selectShareFileList" resultType="cn.vesns.netdisk.common.vo.share.ShareFileListVO">
+        select *
+        from netdisk.sharefile a
+                     left join netdisk.share on netdisk.share.shareBatchNum = a.shareBatchNum
+                     left join netdisk.userfile b on b.userFileId = a.userFileId
+                     left join netdisk.file c on c.fileId = b.fileId
+        where a.shareBatchNum = #{shareBatchNum}
+          and a.shareFilePath = #{shareFilePath}
+    </select>
+</mapper>

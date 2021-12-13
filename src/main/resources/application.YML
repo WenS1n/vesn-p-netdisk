@@ -1,0 +1,104 @@
+server:
+  port: 8082
+
+
+spring:
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        hbm2ddl:
+          auto: update
+    show-sql: true
+  mvc:
+    static-path-pattern: /**
+  web:
+    resources:
+      static-locations: classpath:/static
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2048MB
+      max-request-size: 2048MB
+  redis:
+    port: 6379
+    host: 127.0.0.1
+  profiles:
+    active: prod
+
+
+#  main:
+#    allow-bean-definition-overriding: true
+#    自定义腾讯云配置
+tencent:
+  sms:
+    # 配置腾讯云API密钥的SecretId
+    secretId: 
+    # 配置腾讯云API密钥的SecretKey
+    secretKey: 
+    # 配置短信应用的SDKAppID
+    appId: 
+    # 配置签名内容
+    sign: "文盛的学习测试"
+    # 配置模板ID
+    templateId: 
+    # 配置过期时间
+    expireTime: 
+    # 配置redis存储的key的前缀
+    phonePrefix: 
+vesns:
+  jwt:
+    header: Authorization
+    expire: 604800 #7天，秒单位
+    secret: ji8n3439n439n43ld9ne9343fdfer49h
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: false
+  global-config:
+    banner: false
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: cn.vesns.netdisk.pojo
+
+#fdfs:
+#  connect-timeout: 15000
+#  pool:
+#    max-total: 200
+#    max-total-per-key: 50
+#    max-wait-millis: 5000
+#    so-timeout: 15000.0
+#    tracker-list: 127.0.0.1:22122
+#ufop:
+#  aliyun:
+#    oss:
+#      access-key-id: ''
+#      access-key-secret: ''
+#      bucket-name: ''
+#      endpoint: ''
+#  local-storage-path: ''
+#  storage-type: 0
+#  thumb-image:
+#    height: 150
+#    width: 150
+
+#存储类型
+
+ufop:
+  aliyun:
+    oss:
+      access-key-id: ''
+      access-key-secret: ''
+      bucket-name: ''
+      endpoint: ''
+  local-storage-path: ''
+  storage-type: 0
+  thumb-image:
+    height: 150
+    width: 150
