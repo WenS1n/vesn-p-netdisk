@@ -18,8 +18,7 @@ class NetdiskApplicationTests {
 
         @Test
         public void test() {
-//            System.out.println(PasswordUtil.getSaltValue());
-//            7056985593087575
+
             LambdaQueryWrapper<FileBean> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper.eq(FileBean::getPointCount, 0);
             List<FileBean> list = fileService.list(lambdaQueryWrapper);
